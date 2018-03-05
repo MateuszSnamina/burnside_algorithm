@@ -12,7 +12,7 @@
 
 void print_character_table(const std::vector<arma::cx_vec> & character_table, unsigned precision = 2) {
     auto f = std::cout.flags();
-    std::cout << "Tabela charakterow:" << std::endl;
+    std::cout << "Character table:" << std::endl;
     std::cout << "+";
     for (unsigned i = 0; i < character_table.size(); i++)
         std::cout << std::string(2 * precision + 6 + 1, '-') << '+';
