@@ -15,7 +15,8 @@ namespace armaPatch {
 
     Decomposition eig_gen(const arma::cx_mat & M) {
         Decomposition decomposition = _eig_gen(M);
-        //sprawdzanie poprawnosci [jak cos jest nie tak, to funkcja getEigenVal rzuci wyjatek]
+        // If basisVec is not an eigenvector than
+        // determine_eigen_val function throws an exception.
         const std::vector<arma::cx_vec> basis = decomposition.get_basis();
         for (const arma::cx_vec & basisVec : basis)
             determine_eigen_val(M, basisVec);

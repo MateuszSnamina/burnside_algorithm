@@ -5,14 +5,15 @@
 #include<arma_patch.hpp>
 #include<burnside_algorithm.hpp>
 
-// Ogolna uwaga co do konwencji zapisu w moich obliczeniach grupowych:
-// klasy sprzezonosci numerowane sa liczba unsigned, stosowne zmienne to wielkie litery (R,S,T,I)
-// elementy grupy numerowane sa liczba unsigned, stosowne zmienne to małe litery (r,s,t,i,j)
+// The adopted convention for group's theory related code:
+// (i) Conjugacy classes are indexed by unsigned variables,
+// the letters R,S,T,I,... are used.
+// (ii) Groups elements are indexed by unsigned variables,
+// the letters r,s,t,i,j, ... are used
 
 /*
- * Funkcja wyznaczanaca wszystkie klasy sprzezonosci.
+ * The functions that determines all conjugacy classes.
  */
-
 std::vector<std::vector<unsigned> > determine_conj_classes(const arma::Mat<unsigned> & multiplication) {
     std::vector<std::vector<unsigned> > conj_classes;
     double size_of_group = multiplication.n_rows;
@@ -46,11 +47,11 @@ std::vector<std::vector<unsigned> > determine_conj_classes(const arma::Mat<unsig
 }
 
 // *********************************************************************************************
-// ************************************  Algorytm Burnsidea  ***********************************
+// ************************************  Burnside's algorithm  *********************************
 // *********************************************************************************************
 
 /*
- * Funkcja ta buduje macierze (M_R)_{ST} o elementach c_{RST}
+ * The functions that determines (M_R)_{ST} matrices with c_{RST} matrix elements.
  */
 
 std::vector<arma::mat> bulid_Ms(const arma::Mat<unsigned> & multiplication, std::vector<std::vector<unsigned> > conj_classes) {
@@ -73,25 +74,27 @@ std::vector<arma::mat> bulid_Ms(const arma::Mat<unsigned> & multiplication, std:
 }
 
 /* 
- * Funkcja ta budujące tabele charakterow.
+ * The functions that determines character_table:
  * 
- * Argumenty funkcji:
+ * The arguments:
  *
  * multiplication:
- * to tabela mnozenia w grupie; 
- * Konwencje:
- * lewy indeks(indeks wiersza)  odpowiada elementowi stojącemu po lewej  stronie znaku dzialania grupowego.
- * prawy indeks(indeks kolumny) odpowiada elementowi stojącemu po prawej stronie znaku dzialania grupowego.
- * Elementem grupy odpowiadającym indeksowi równemu zero jest element neutralny.
+ * the group multiplication table.
+ * conventions and constrains:
+ * the left index (row index) corresponds to the left operand in the group multiplication.
+ * the right index (coll index) corresponds to the right operand in the group multiplication.
+ * The neutral group element is indexed by the index equals to 0.
  *
  * conj_classes:
- * to wektor trzymajacy klasy sprzezonosci
- * klasa sprzezonosci jest tu wektorem indeksow elementow grupy z tejze klasy.
+ * all the conjugacy classes for the given group.
+ * A conjugacy class is represented by a vector of indices
+ * corresponding to the groups elements belonging to the conjugacy class.
  * 
- * Wynik działania:
- * Funkcja zwraca vektor vektorow,
- * wewnetrzne wektory to wiersze tabeli chakakterów.
- * 
+ * Returns:
+ * A vector of vector of the character table
+ * The inner vectors are the rows of the table.
+ * Convention: there is one entry per one conjugacy class
+ * (not one entry for one group element).
  */
 std::vector<arma::cx_vec> build_character_table(const arma::Mat<unsigned> & multiplication, const std::vector<std::vector<unsigned> > & conj_classes) {
     // Tu bedzie zapisywany wynik tej tunkcji.
