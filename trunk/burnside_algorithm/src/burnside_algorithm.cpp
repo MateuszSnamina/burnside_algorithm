@@ -9,10 +9,10 @@
 // (i) Conjugacy classes are indexed by unsigned variables,
 // the letters R,S,T,I,... are used.
 // (ii) Groups elements are indexed by unsigned variables,
-// the letters r,s,t,i,j, ... are used
+// the letters r,s,t,i,j,... are used
 
 /*
- * The functions that determines all conjugacy classes.
+ * The functions that determines all the conjugacy classes.
  */
 std::vector<std::vector<unsigned> > determine_conj_classes(const arma::Mat<unsigned> & multiplication) {
     std::vector<std::vector<unsigned> > conj_classes;
@@ -74,7 +74,7 @@ std::vector<arma::mat> bulid_Ms(const arma::Mat<unsigned> & multiplication, std:
 }
 
 /* 
- * The functions that determines character_table:
+ * The functions that determines the character table:
  * 
  * The arguments:
  *
@@ -131,14 +131,26 @@ std::vector<arma::cx_vec> build_character_table(const arma::Mat<unsigned> & mult
     return character_table;
 }
 
+
+/* 
+ * The functions that determines the character table:
+ * 
+ * The arguments:
+ *
+ * multiplication:
+ * the group multiplication table.
+ * conventions and constrains:
+ * the left index (row index) corresponds to the left operand in the group multiplication.
+ * the right index (coll index) corresponds to the right operand in the group multiplication.
+ * The neutral group element is indexed by the index equals to 0.
+ *
+ * Returns:
+ * A vector of vector of the character table
+ * The inner vectors are the rows of the table.
+ * Convention: there is one entry per one conjugacy class
+ * (not one entry for one group element).
+ */
 std::vector<arma::cx_vec> build_character_table(const arma::Mat<unsigned> & multiplication) {
-    // Argumenty funkcji:
-    //
-    // mat &multiplication to tabela mnozenia w grupie; 
-    // Konwencje:
-    // lewy indeks(indeks wiersza)  odpowiada elementowi stojącemu po lewej  stronie znaku dzialania grupowego.
-    // prawy indeks(indeks kolumny) odpowiada elementowi stojącemu po prawej stronie znaku dzialania grupowego.
-    // Elementem grupy odpowiadającym indeksowi równemu zero jest element neutralny.
     std::vector<std::vector<unsigned> > conj_classes = determine_conj_classes(multiplication);
     return build_character_table(multiplication, conj_classes);
 }
