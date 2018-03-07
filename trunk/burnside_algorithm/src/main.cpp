@@ -47,7 +47,7 @@ void print_character_table(const std::vector<arma::cx_vec> & character_table, un
 
 void print_conj_classes(const std::vector<std::vector<unsigned> > & conjClasses) {
     auto f = std::cout.flags();
-    std::cout << "Klasy sprzezonosci:" << std::endl;
+    std::cout << "Conjugacy classes:" << std::endl;
     std::cout << std::right;
     for (unsigned i = 0; i < conjClasses.size(); i++) {
         std::cout << std::setw(5) << "[" + std::to_string(i) + "]" << " = {";
@@ -62,14 +62,19 @@ void print_conj_classes(const std::vector<std::vector<unsigned> > & conjClasses)
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        std::cerr << "POJAJ JAKO JEDYNY ARGUMENT SCIEZKE PLIKU Z MACIERZA MNOZENIA GRUPOWEGO" << std::endl;
+        std::cerr << "The program determine the character table for given group." << std::endl;
+        std::cerr << "Input:  the group multiplication table." << std::endl;
+        std::cerr << "Output: the group character table." << std::endl;
+        std::cerr << "" << std::endl;
+        std::cerr << "Synopis:" << std::endl;
+        std::cerr << argv[0] << " path_to_matrix_file_with_multiplication_table" << std::endl;                
         return 1;
     }
     // Czytanie pliku zawierajacego tabele mnozenia grupowego:
     std::string fileName = argv[1];
     std::shared_ptr<arma::Mat<unsigned>> multiplication_ptr(file_to_mat<unsigned>(fileName));
     std::cout << std::endl;
-    multiplication_ptr->print("Tabela mnozenia grupowego:");
+    multiplication_ptr->print("Group multiplication table:");
     std::cout << std::endl;
     // Znajdujemy klasy sprzezonosci:
     std::vector<std::vector<unsigned> > conj_classes = determine_conj_classes(*multiplication_ptr);
@@ -106,4 +111,4 @@ int main(){
         eigvec.print("eigvec");
 	
 }
-*/
+ */

@@ -9,26 +9,29 @@
 #include<arma_patch.hpp>
 
 /*
- *  Konstruktor budujacy rozklad identycznosci dla zerowymiarowej przestrzeni.
+ * The constructor making the trivial unity decomposition (ie. id=id) 
+ * in zero dimensional space.
  */
 armaPatch::Decomposition::Decomposition() : _m_dim(0) {
 };
 
 /*
- *  Konstruktor budujacy trywialny rozklad identycznosci (tj. id=id).
+ * The constructor making the trivial unity decomposition (ie. id=id) 
+ * in space of given dimension.
  */
 armaPatch::Decomposition::Decomposition(unsigned dim) : _m_dim(dim) {
     _m_projections.push_back(arma::diagmat(arma::cx_vec(dim, arma::fill::ones)));
 }
 
 /*
- * Funkcja budujaca rozklad identycznosci prosta bedacy ,,przecieciem'' dwoch zadanych rozkladow
+ * The factory function returning unity decomposition 
+ * being the intersection of the two given decompositions.
  */
 armaPatch::Decomposition armaPatch::Decomposition::common_decomposition(Decomposition decomposition1, Decomposition decomposition2) {
     if (decomposition1._m_dim != decomposition2._m_dim) {
         std::string str = "The two given decomposition are not defined in spaces of the same dimension. "
                 "(Note: The two given decompositions to combine must have the same dimension.)";
-                throw std::invalid_argument(str);
+        throw std::invalid_argument(str);
     }
     armaPatch::Decomposition finalDecomposition;
     finalDecomposition._m_dim = decomposition1.get_dim();
@@ -42,7 +45,8 @@ armaPatch::Decomposition armaPatch::Decomposition::common_decomposition(Decompos
 }
 
 /*
- * Funkcja budujaca rozklad identycznosci bedacy ,,przecieciem'' wielu zadanych rozkladow
+ * The factory function returning unity decomposition 
+ * being the intersection of many given decompositions.
  */
 armaPatch::Decomposition armaPatch::Decomposition::common_decomposition(const std::vector<Decomposition> & decompositions) {
     armaPatch::Decomposition finalDecomposition(decompositions[0].get_dim());
@@ -52,10 +56,11 @@ armaPatch::Decomposition armaPatch::Decomposition::common_decomposition(const st
 }
 
 /*
- * Funkcja budujaca rozklad identycznosci 
- * rownowazy
- * rozkladowi na sume prosta podprzestrzeni
- * zdefiniowanych przez wektory z eigVecs o tych samych wartosciach eigVals.
+ * The factory function returning unity decomposition 
+ * that reflect a matrix spectral decomposition.
+ * The matrix is specified by its eigenvalues and eigenvectors.
+ * The threshold is a numeric parameter determining
+ * whether or not the two eigenvalues are considered the same.
  */
 armaPatch::Decomposition armaPatch::Decomposition::decomposition_from_eigval_and_eigvec(const arma::vec & eig_vals, const arma::cx_mat & eig_vecs, double threshold) {
     armaPatch::Decomposition decomposition;
@@ -78,7 +83,11 @@ armaPatch::Decomposition armaPatch::Decomposition::decomposition_from_eigval_and
 }
 
 /*
- *  Funkcja budujaca rozklad identycznosci zwiazana z prawymi wektorami singularnymi:
+ * The factory function returning unity decomposition 
+ * that reflect a matrix SVD.
+ * The matrix is given explicitely.
+ * The threshold is a numeric parameter determining
+ * whether or not the two singular values are considered the same.
  */
 armaPatch::Decomposition armaPatch::Decomposition::decomposition_from_rightEigVecs(const arma::cx_mat & M, double threshold) {
     if (M.n_rows != M.n_cols) {
@@ -92,7 +101,11 @@ armaPatch::Decomposition armaPatch::Decomposition::decomposition_from_rightEigVe
 }
 
 /*
- *  Funkcja budujaca rozklad identycznosci zwiazana z wektorami wlasnymi macierzy symetrycznej:
+ * The factory function returning unity decomposition 
+ * that reflect a symmetric matrix spectral decomposition.
+ * The matrix is given explicitely.
+ * The threshold is a numeric parameter determining
+ * whether or not the two eigenvalues are considered the same.
  */
 armaPatch::Decomposition armaPatch::Decomposition::decomposition_from_eigVecs_of_symMat(const arma::mat & M, const char* method, double threshold) {
     arma::vec eigVals;
@@ -103,7 +116,10 @@ armaPatch::Decomposition armaPatch::Decomposition::decomposition_from_eigVecs_of
 }
 
 /*
- *  Funkcja zwracajaca wektory, na ktore rzutuja operatory rzutowe wystepujace w rozkladzie identycznosci
+ * The function return the base that made up by
+ * common eigenvectors for all the decomposition projection operators.
+ * (The projection operators may either annihilate the basis vector or leave unchanged,
+ * in other words the two possible eigenvalues are 0 and 1).
  */
 std::vector<arma::cx_vec> armaPatch::Decomposition::get_basis() const {
     std::vector<arma::cx_vec> basis;
@@ -112,9 +128,10 @@ std::vector<arma::cx_vec> armaPatch::Decomposition::get_basis() const {
         arma::cx_mat beta;
         arma::eig_gen(eigVals, beta, projection);
         for (unsigned i = 0; i < _m_dim; i++)
-            if (std::abs(eigVals(i) - 1.0) < 1e-6) basis.push_back(beta.col(i));
+            if (std::abs(eigVals(i) - 1.0) < 1e-6)
+                basis.push_back(beta.col(i));
             else if (std::abs(eigVals(i)) > 1e-6) {
-                std::string str = "zmaleziono operator rzutowy o wartosci wlasnej."
+                std::string str = "Internal error: the projection operator has an eigenvalue other than 0 or 1."
                         + std::to_string(std::real(eigVals(i))) + " " + std::to_string(std::imag(eigVals(i))) + "i.";
                 throw std::logic_error(str);
             }
@@ -131,8 +148,11 @@ void armaPatch::Decomposition::print() const {
         arma::cx_mat beta;
         arma::eig_gen(eigVals, beta, projection);
         for (unsigned i = 0; i < _m_dim; i++)
-            if (std::abs(eigVals(i) - 1.0) < 0.0001) beta.col(i).print("wektor bazowy");
-            else if (std::abs(eigVals(i)) > 0.0001) std::cout << "COS NIE TAK JEST Z TYM OPERATOREM RZUTOWYM, jego wartosc wlasna wynosi:" << eigVals(i) << std::endl;
+            if (std::abs(eigVals(i) - 1.0) < 1e-6)
+                beta.col(i).print("the basis vector:");
+            else if (std::abs(eigVals(i)) > 1e-6)
+                std::cout << "Internal error: the projection operator has an eigenvalue other than 0 or 1." <<
+                    "The eigenvalue is equal to:" << eigVals(i) << std::endl;
     }
     std::cout << std::string(100, '#') << std::endl;
 }
