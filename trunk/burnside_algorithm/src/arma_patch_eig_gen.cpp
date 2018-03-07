@@ -6,8 +6,8 @@ namespace armaPatch {
 
     Decomposition _eig_gen(const arma::cx_mat & M) {
         const int dim = M.n_rows;
-        const arma::cx_mat oneMatrix = arma::eye<arma::cx_mat>(dim, dim);
-        std::vector<arma::cx_mat> Ms = {M, M + 1 * oneMatrix, M + arma::cx_double(0, 1) * oneMatrix};
+        const arma::cx_mat unity_matrix = arma::eye<arma::cx_mat>(dim, dim);
+        std::vector<arma::cx_mat> Ms = {M, M + 1 * unity_matrix, M + arma::cx_double(0, 1) * unity_matrix};
         Decomposition decomposition = common_svn(Ms);
         //std::vector<arma::cx_vec> basis = decomposition.get_basis();
         return decomposition;
@@ -15,11 +15,11 @@ namespace armaPatch {
 
     Decomposition eig_gen(const arma::cx_mat & M) {
         Decomposition decomposition = _eig_gen(M);
-        // If basisVec is not an eigenvector than
-        // determine_eigen_val function throws an exception.
         const std::vector<arma::cx_vec> basis = decomposition.get_basis();
-        for (const arma::cx_vec & basisVec : basis)
-            determine_eigen_val(M, basisVec);
+        // If basis_vec is not an eigenvector than
+        // determine_eigen_val function throws an exception.
+        for (const arma::cx_vec & basis_vec : basis)
+            determine_eigen_val(M, basis_vec);
         return decomposition;
     }
 
